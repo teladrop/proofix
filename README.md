@@ -1,30 +1,178 @@
-# Proofix landing page design
+# Proofix - Shopify Review Management App
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
+A comprehensive Shopify app that helps stores collect, display, and leverage customer reviews to boost conversions with smart automation and beautiful galleries.
 
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/teladrops-projects/v0-proofix-landing-page-design)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/XRFIh1FsAiQ)
+## Features
 
-## Overview
+- **Automated Review Collection**: Automatically request reviews from customers after purchase
+- **Photo & Video Reviews**: Collect authentic visual content from customers
+- **Smart Filtering**: Help customers find reviews from people like them
+- **AI-Powered Insights**: Get intelligent summaries and trends from reviews
+- **UGC Generator**: AI-powered content creation for authentic user-generated content
+- **Beautiful Galleries**: Display reviews in conversion-optimized layouts
+- **Shopify Integration**: Seamless integration with Shopify stores
 
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
+## Tech Stack
+
+- **Frontend**: Next.js 15, React 19, TypeScript
+- **UI**: Tailwind CSS, shadcn/ui components
+- **Shopify**: Shopify API v8, OAuth integration
+- **Styling**: Custom design system with responsive components
+
+## Setup Instructions
+
+### 1. Prerequisites
+
+- Node.js 18+ 
+- pnpm (recommended) or npm
+- Shopify Partner account
+- Domain with SSL (for production)
+
+### 2. Installation
+
+```bash
+# Clone the repository
+git clone <repository-url>
+cd proofix
+
+# Install dependencies
+pnpm install
+
+# Install Shopify SDK
+pnpm add @shopify/shopify-api @shopify/shopify-app-session-storage-memory
+```
+
+### 3. Environment Configuration
+
+Create a `.env.local` file in the root directory:
+
+```env
+# Shopify App Configuration
+SHOPIFY_API_KEY=your_shopify_api_key_here
+SHOPIFY_API_SECRET=your_shopify_api_secret_here
+SHOPIFY_SCOPES=read_products,write_products,read_orders,write_orders,read_customers,write_customers,read_reviews,write_reviews
+SHOPIFY_APP_URL=https://your-app-domain.com
+SHOPIFY_APP_NAME=Proofix
+
+# Next.js
+NEXTAUTH_URL=https://your-app-domain.com
+NEXTAUTH_SECRET=your_nextauth_secret_here
+
+# Database (for session storage)
+DATABASE_URL=your_database_url_here
+```
+
+### 4. Shopify Partner App Setup
+
+1. Go to your [Shopify Partner Dashboard](https://partners.shopify.com)
+2. Create a new app
+3. Configure the following settings:
+
+#### App URLs
+- **App URL**: `https://your-domain.com/shopify`
+- **Allowed redirection URLs**: 
+  - `https://your-domain.com/api/auth/shopify/callback`
+  - `https://your-domain.com/install`
+
+#### Webhooks
+- **Orders/fulfilled**: `https://your-domain.com/api/webhooks/shopify`
+- **Orders/paid**: `https://your-domain.com/api/webhooks/shopify`
+- **Products/update**: `https://your-domain.com/api/webhooks/shopify`
+
+#### App Permissions
+- `read_products`, `write_products`
+- `read_orders`, `write_orders`
+- `read_customers`, `write_customers`
+- `read_reviews`, `write_reviews`
+
+### 5. Development
+
+```bash
+# Start development server
+pnpm dev
+
+# Build for production
+pnpm build
+
+# Start production server
+pnpm start
+```
+
+### 6. Testing the App
+
+1. **Local Development**: Use ngrok or similar for HTTPS tunneling
+2. **Installation Flow**: 
+   - Visit `/install?shop=your-store.myshopify.com`
+   - Complete OAuth flow
+   - App will redirect to Shopify admin
+
+## App Structure
+
+```
+proofix/
+├── app/
+│   ├── api/
+│   │   ├── auth/shopify/          # OAuth routes
+│   │   ├── shopify/               # Shopify API endpoints
+│   │   └── webhooks/shopify/      # Webhook handlers
+│   ├── install/                   # App installation page
+│   ├── shopify/                   # Main app interface
+│   └── ...                        # Other pages
+├── components/
+│   ├── shopify-app-provider.tsx   # Shopify context
+│   ├── dashboard-layout.tsx       # Main app layout
+│   └── ...                        # UI components
+├── hooks/
+│   └── use-shopify-data.ts       # Shopify data hooks
+├── lib/
+│   ├── shopify.ts                 # Shopify configuration
+│   └── utils.ts                   # Utilities
+└── middleware.ts                  # App middleware
+```
+
+## Key Components
+
+### Shopify Integration
+- **OAuth Flow**: Handles app installation and authentication
+- **Webhooks**: Processes Shopify events (orders, products)
+- **API Routes**: Fetches store data (products, orders)
+- **Embedded App**: Runs within Shopify admin
+
+### UI Components
+- **Dashboard**: Overview with metrics and charts
+- **Reviews**: Manage and display customer reviews
+- **UGC Gallery**: Visual content management
+- **UGC Generator**: AI-powered content creation
+- **Automation**: Workflow management
+- **Widgets**: Embeddable components
+- **Settings**: App configuration
 
 ## Deployment
 
-Your project is live at:
+### Vercel (Recommended)
+1. Connect your repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Deploy automatically on push
 
-**[https://vercel.com/teladrops-projects/v0-proofix-landing-page-design](https://vercel.com/teladrops-projects/v0-proofix-landing-page-design)**
+### Other Platforms
+- Ensure HTTPS is enabled
+- Set all environment variables
+- Configure custom domain
 
-## Build your app
+## Security Considerations
 
-Continue building your app on:
+- **HMAC Validation**: All webhooks are verified
+- **Session Management**: Secure session storage
+- **CSP Headers**: Proper content security policy
+- **OAuth Security**: Follow Shopify security guidelines
 
-**[https://v0.dev/chat/projects/XRFIh1FsAiQ](https://v0.dev/chat/projects/XRFIh1FsAiQ)**
+## Support
 
-## How It Works
+For support and questions:
+- Check the [Shopify App Development documentation](https://shopify.dev/apps)
+- Review [Next.js documentation](https://nextjs.org/docs)
+- Contact the development team
 
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+## License
+
+This project is licensed under the MIT License.

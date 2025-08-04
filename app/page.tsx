@@ -78,7 +78,7 @@ export default function ProofixLanding() {
             </Link>
             <Link href="/auth/login" className="text-gray-600 hover:text-primary transition-colors">
               <Button variant="outline" size="sm">
-                Sign In
+                Install App
               </Button>
             </Link>
             <Link href="/auth/signup">
@@ -105,7 +105,7 @@ export default function ProofixLanding() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
             <Link href="/auth/signup">
               <Button size="lg" className="text-lg px-8 py-4 h-auto bg-primary hover:bg-primary/90">
-                Get Started Free
+                Install on Shopify
                 <ArrowRight className="ml-2 h-5 w-5" />
               </Button>
             </Link>

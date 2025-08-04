@@ -3,489 +3,464 @@
 import { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Textarea } from "@/components/ui/textarea"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import {
-  Wand2,
-  Lightbulb,
-  Target,
-  Zap,
-  Copy,
-  Download,
-  Edit,
-  Eye,
-  Share2,
-  Heart,
-  MessageCircle,
-  RotateCcw,
-  Sparkles,
-  ImageIcon,
-  Video,
-} from "lucide-react"
+import { Sparkles, Shuffle, Edit, Eye, Share, Star, Heart, MessageCircle, Download } from "lucide-react"
+import Image from "next/image"
 
-type GenerationStep = "form" | "generating" | "complete"
+const products = [
+  { id: "1", name: "Summer Dress Collection", category: "Clothing" },
+  { id: "2", name: "Organic Face Serum", category: "Beauty" },
+  { id: "3", name: "Fitness Resistance Bands", category: "Fitness" },
+  { id: "4", name: "Digital Marketing Course", category: "Digital" },
+  { id: "5", name: "Skincare Bundle", category: "Beauty" },
+  { id: "6", name: "Yoga Mat Premium", category: "Fitness" },
+]
+
+const styleTags = ["Lifestyle", "Studio", "Casual", "Aesthetic", "Professional", "Candid"]
+
+const toneOptions = [
+  { value: "friendly", label: "Friendly" },
+  { value: "informative", label: "Informative" },
+  { value: "funny", label: "Funny" },
+  { value: "enthusiastic", label: "Enthusiastic" },
+  { value: "professional", label: "Professional" },
+]
+
+const examplePrompts = [
+  "Woman in activewear stretching in a park, sunny day, confident expression",
+  "Person applying skincare product in modern bathroom, natural lighting, satisfied smile",
+  "Fitness enthusiast using resistance bands at home gym, focused and determined",
+  "Student taking online course on laptop in cozy coffee shop, engaged and learning",
+  "Model wearing summer dress walking through city street, vibrant and stylish",
+  "Person doing yoga on premium mat in serene studio, peaceful and centered",
+]
 
 export function UGCGeneratorPage() {
-  const [currentStep, setCurrentStep] = useState<GenerationStep>("form")
-  const [generationProgress, setGenerationProgress] = useState(0)
-  const [selectedContentType, setSelectedContentType] = useState("social-post")
+  const [selectedProduct, setSelectedProduct] = useState("")
+  const [prompt, setPrompt] = useState("")
+  const [selectedStyles, setSelectedStyles] = useState<string[]>([])
+  const [selectedTone, setSelectedTone] = useState("")
+  const [reviewerName, setReviewerName] = useState("")
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [showResults, setShowResults] = useState(false)
+  const [generatedUGC, setGeneratedUGC] = useState<any[]>([])
 
-  const handleGenerateContent = () => {
-    setCurrentStep("generating")
-
-    // Simulate generation progress
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += Math.random() * 20
-      if (progress >= 100) {
-        progress = 100
-        setCurrentStep("complete")
-        clearInterval(interval)
-      }
-      setGenerationProgress(progress)
-    }, 300)
+  const handleStyleToggle = (style: string) => {
+    setSelectedStyles((prev) => (prev.includes(style) ? prev.filter((s) => s !== style) : [...prev, style]))
   }
 
-  const contentTypes = [
-    { id: "social-post", name: "Social Media Post", icon: Heart, desc: "Instagram, Facebook, Twitter posts" },
-    { id: "story", name: "Story Content", icon: ImageIcon, desc: "Instagram & Facebook stories" },
-    { id: "video-script", name: "Video Script", icon: Video, desc: "TikTok, YouTube, Instagram Reels" },
-    { id: "ad-copy", name: "Ad Copy", icon: Target, desc: "Facebook & Google Ads" },
-  ]
+  const handleSurpriseMe = () => {
+    const randomPrompt = examplePrompts[Math.floor(Math.random() * examplePrompts.length)]
+    setPrompt(randomPrompt)
 
-  const generatedContent = [
-    {
-      id: 1,
-      type: "Social Post",
-      style: "Casual",
-      tone: "Excited",
-      content:
-        "OMG guys! 😍 Just tried the new AirPods Pro and I'm absolutely OBSESSED! The noise cancellation is next level - I literally can't hear my neighbor's dog barking anymore 🙉 Perfect for my morning workouts and those long commute days. Who else is loving these? #AirPods #TechReview #MusicLover",
-      engagement: { likes: "2.3k", comments: "184", shares: "67" },
-      platforms: ["Instagram", "Facebook"],
-    },
-    {
-      id: 2,
-      type: "Story Content",
-      style: "Professional",
-      tone: "Informative",
-      content:
-        "🎧 AirPods Pro Review: 3 months later\n✅ Amazing noise cancellation\n✅ Great battery life\n✅ Perfect fit\n❌ Pricey but worth it\n\nSwipe up for full review! 👆",
-      engagement: { views: "5.2k", replies: "89", shares: "34" },
-      platforms: ["Instagram Stories", "Facebook Stories"],
-    },
-    {
-      id: 3,
-      type: "Video Script",
-      style: "Energetic",
-      tone: "Enthusiastic",
-      content:
-        "[Hook] Wait until you see what these AirPods can do...\n[Setup] So I've been testing the AirPods Pro for 3 months\n[Problem] My old earbuds kept falling out during workouts\n[Solution] These literally changed my entire routine\n[CTA] Comment 'AIRPODS' if you want the link!",
-      engagement: { views: "12.4k", likes: "892", comments: "156" },
-      platforms: ["TikTok", "Instagram Reels"],
-    },
-    {
-      id: 4,
-      type: "Ad Copy",
-      style: "Persuasive",
-      tone: "Urgent",
-      content:
-        "🔥 LIMITED TIME: AirPods Pro 40% OFF\n\n✨ Crystal clear sound quality\n✨ All-day battery life\n✨ Sweat & water resistant\n\nDon't miss out - only 48 hours left!\n👉 Shop now and transform your audio experience",
-      engagement: { ctr: "3.2%", conversions: "127", cost: "$0.89" },
-      platforms: ["Facebook Ads", "Google Ads"],
-    },
-  ]
+    // Randomly select styles and tone
+    const randomStyles = styleTags.slice(0, Math.floor(Math.random() * 3) + 1)
+    setSelectedStyles(randomStyles)
 
-  const renderFormStep = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      {/* Main Form - Left Column (2/3) */}
-      <div className="lg:col-span-2">
-        <Card>
+    const randomTone = toneOptions[Math.floor(Math.random() * toneOptions.length)]
+    setSelectedTone(randomTone.value)
+
+    // Random reviewer name
+    const names = ["Sarah", "Emma", "Mia", "Alex", "Jordan", "Casey", "Taylor", "Morgan"]
+    setReviewerName(names[Math.floor(Math.random() * names.length)])
+  }
+
+  const generateReviewText = (productName: string, tone: string, reviewerName: string) => {
+    const reviews = {
+      friendly: [
+        `Just got my ${productName} and I'm absolutely loving it! 😍 The quality is amazing and it's exactly what I needed. Highly recommend to anyone looking for something like this! #ProductReview #Happy`,
+        `OMG you guys! This ${productName} is incredible! 💕 I've been using it for a week now and I can already see such a difference. Best purchase I've made in a while! #Obsessed`,
+        `Can't stop raving about my new ${productName}! ✨ It's everything I hoped for and more. The quality is top-notch and it fits perfectly into my routine. So happy with this purchase!`,
+      ],
+      informative: [
+        `After 3 weeks of testing the ${productName}, here's my honest review: The build quality is excellent, functionality meets expectations, and it delivers on all promised features. Worth the investment for anyone serious about quality.`,
+        `Detailed review of ${productName}: Pros - High quality materials, great performance, excellent value. Cons - None so far! This has exceeded my expectations in every way. Recommended for anyone looking for reliability.`,
+        `${productName} review update: Been using this for a month now. The durability is impressive, performance is consistent, and it's become an essential part of my daily routine. Solid 5-star product.`,
+      ],
+      funny: [
+        `POV: You finally found the perfect ${productName} that doesn't disappoint! 😂 My expectations were low but this thing really said "hold my beer" and delivered beyond belief. 10/10 would buy again!`,
+        `Me: I don't need another ${productName}\nAlso me: *buys it anyway*\nMe now: Why didn't I get this sooner?! 🤦‍♀️ This is actually life-changing and I'm not even being dramatic (okay maybe a little)`,
+        `Breaking news: Local person discovers ${productName} that actually works as advertised! 📰 In other shocking news, I'm now obsessed and telling everyone about it. You're welcome for the recommendation!`,
+      ],
+      enthusiastic: [
+        `GUYS!!! This ${productName} is EVERYTHING! 🔥 I literally cannot contain my excitement right now! The quality, the performance, the value - it's all perfect! I'm telling everyone about this! #GameChanger #Obsessed`,
+        `I'M SCREAMING! This ${productName} just arrived and it's even better than I imagined! 🙌 The attention to detail is incredible and it works flawlessly! Already planning to get another one! #BestPurchaseEver`,
+        `STOP EVERYTHING and get yourself this ${productName}! 💥 I've never been more excited about a purchase! It's absolutely perfect and has exceeded every single expectation! You NEED this in your life!`,
+      ],
+      professional: [
+        `Professional review of ${productName}: Exceptional build quality, reliable performance, and excellent value proposition. After extensive testing, I can confidently recommend this to colleagues and clients. A worthwhile investment.`,
+        `${productName} assessment: Superior craftsmanship, consistent results, and professional-grade quality. This product delivers on its promises and maintains high standards throughout extended use. Highly recommended for professional applications.`,
+        `Comprehensive evaluation of ${productName}: Outstanding performance metrics, durable construction, and competitive pricing. This represents excellent value in the market and meets all professional requirements. Recommended without reservation.`,
+      ],
+    }
+
+    const toneReviews = reviews[tone as keyof typeof reviews] || reviews.friendly
+    return toneReviews[Math.floor(Math.random() * toneReviews.length)]
+  }
+
+  const generateUserData = (name: string) => {
+    const usernames = {
+      Sarah: "Sarah_FitLife",
+      Emma: "EmmaGlowUp",
+      Mia: "MiaStyleDiary",
+      Alex: "AlexReviews",
+      Jordan: "JordanLifestyle",
+      Casey: "CaseyFinds",
+      Taylor: "TaylorTrends",
+      Morgan: "MorganMoments",
+    }
+
+    return {
+      userName: usernames[name as keyof typeof usernames] || `${name}_Reviews`,
+      userAvatar: `/placeholder.svg?height=40&width=40&text=${name.charAt(0)}`,
+      verified: Math.random() > 0.6,
+      likes: Math.floor(Math.random() * 5000) + 500,
+      comments: Math.floor(Math.random() * 300) + 50,
+      timeAgo: ["2 hours ago", "1 day ago", "2 days ago", "3 days ago", "1 week ago"][Math.floor(Math.random() * 5)],
+    }
+  }
+
+  const handleGenerate = async () => {
+    if (!selectedProduct || !prompt) return
+
+    setIsGenerating(true)
+
+    // Simulate generation time
+    setTimeout(() => {
+      const selectedProductName = products.find((p) => p.id === selectedProduct)?.name || "Product"
+      const finalReviewerName = reviewerName || "Sarah"
+      const finalTone = selectedTone || "friendly"
+      const finalStyle = selectedStyles[0] || "Lifestyle"
+
+      const userData = generateUserData(finalReviewerName)
+      const reviewText = generateReviewText(selectedProductName, finalTone, finalReviewerName)
+
+      // Generate 4 variations
+      const newUGC = Array.from({ length: 4 }, (_, index) => {
+        const variations = [
+          "natural lighting professional photography",
+          "candid lifestyle shot authentic moment",
+          "studio lighting clean background",
+          "golden hour outdoor natural setting",
+        ]
+
+        const imagePrompt = `${prompt}, ${variations[index]}, high quality, realistic, authentic user generated content style`
+
+        return {
+          id: index + 1,
+          image: `/placeholder.svg?height=400&width=400&query=${encodeURIComponent(imagePrompt)}`,
+          userAvatar: userData.userAvatar,
+          userName: userData.userName,
+          verified: userData.verified,
+          rating: 5,
+          reviewText: reviewText,
+          likes: userData.likes + index * 100,
+          comments: userData.comments + index * 10,
+          timeAgo: userData.timeAgo,
+          style: finalStyle,
+          tone: finalTone,
+          productInImage: selectedProductName,
+        }
+      })
+
+      setGeneratedUGC(newUGC)
+      setIsGenerating(false)
+      setShowResults(true)
+    }, 3000)
+  }
+
+  return (
+    <div className="space-y-6">
+      {/* Header */}
+      <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+        <div className="flex items-center space-x-3 mb-4">
+          <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary/80 rounded-xl flex items-center justify-center">
+            <Sparkles className="h-6 w-6 text-white" />
+          </div>
+          <div>
+            <h2 className="text-2xl font-bold text-primary">UGC Generator</h2>
+            <p className="text-gray-600">Create authentic user-generated content with AI-powered images and reviews</p>
+          </div>
+        </div>
+
+        <div className="bg-gradient-to-r from-accent/10 to-accent/5 rounded-lg p-4">
+          <p className="text-sm text-gray-700">
+            ✨ Generate realistic user-generated content with authentic-looking photos and genuine review text that
+            resonates with your audience.
+          </p>
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Generation Form */}
+        <Card className="bg-white border-0 shadow-sm">
           <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Wand2 className="h-5 w-5 text-primary" />
-              <span>AI UGC Generator</span>
-            </CardTitle>
+            <CardTitle className="text-lg font-semibold text-primary">Generate New UGC</CardTitle>
           </CardHeader>
           <CardContent className="space-y-6">
-            {/* Content Type Selection */}
+            {/* Product Selection */}
             <div>
-              <Label className="text-base font-medium mb-3 block">Content Type</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {contentTypes.map((type) => (
-                  <Card
-                    key={type.id}
-                    className={`cursor-pointer transition-all duration-200 ${
-                      selectedContentType === type.id ? "ring-2 ring-primary bg-primary/5" : "hover:shadow-md"
-                    }`}
-                    onClick={() => setSelectedContentType(type.id)}
-                  >
-                    <CardContent className="p-4">
-                      <div className="flex items-center space-x-3">
-                        <type.icon className="h-5 w-5 text-primary" />
-                        <div>
-                          <div className="font-medium">{type.name}</div>
-                          <div className="text-sm text-gray-600">{type.desc}</div>
-                        </div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">Select Product</Label>
+              <Select value={selectedProduct} onValueChange={setSelectedProduct}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose a product from your store" />
+                </SelectTrigger>
+                <SelectContent>
+                  {products.map((product) => (
+                    <SelectItem key={product.id} value={product.id}>
+                      <div className="flex items-center justify-between w-full">
+                        <span>{product.name}</span>
+                        <Badge variant="secondary" className="ml-2 text-xs">
+                          {product.category}
+                        </Badge>
                       </div>
-                    </CardContent>
-                  </Card>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Image Description */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">Describe the image you want</Label>
+              <Textarea
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                placeholder="E.g., Woman in activewear stretching in a park, sunny day, confident expression"
+                rows={4}
+                className="resize-none"
+              />
+            </div>
+
+            {/* Reviewer Name */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">Reviewer Name (Optional)</Label>
+              <Input
+                value={reviewerName}
+                onChange={(e) => setReviewerName(e.target.value)}
+                placeholder="e.g., Sarah, Alex, Jordan..."
+                className="w-full"
+              />
+            </div>
+
+            {/* Style Tags */}
+            <div>
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">Style Tags (Optional)</Label>
+              <div className="flex flex-wrap gap-2">
+                {styleTags.map((style) => (
+                  <Button
+                    key={style}
+                    variant={selectedStyles.includes(style) ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handleStyleToggle(style)}
+                    className={selectedStyles.includes(style) ? "bg-primary text-white" : ""}
+                  >
+                    {style}
+                  </Button>
                 ))}
               </div>
             </div>
 
-            {/* Product Information */}
-            <div className="space-y-4">
-              <Label className="text-base font-medium">Product Information</Label>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <Label htmlFor="product-name">Product Name</Label>
-                  <Input id="product-name" placeholder="AirPods Pro (2nd Generation)" className="mt-1" />
-                </div>
-                <div>
-                  <Label htmlFor="brand">Brand</Label>
-                  <Input id="brand" placeholder="Apple" className="mt-1" />
-                </div>
-              </div>
-              <div>
-                <Label htmlFor="product-description">Product Description</Label>
-                <Textarea
-                  id="product-description"
-                  placeholder="Describe your product's key features, benefits, and unique selling points..."
-                  className="mt-1"
-                  rows={3}
-                />
-              </div>
-            </div>
-
-            {/* Style & Tone */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor="content-style">Content Style</Label>
-                <Select defaultValue="casual">
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="casual">Casual & Friendly</SelectItem>
-                    <SelectItem value="professional">Professional</SelectItem>
-                    <SelectItem value="energetic">Energetic & Fun</SelectItem>
-                    <SelectItem value="minimalist">Minimalist</SelectItem>
-                    <SelectItem value="luxury">Luxury & Premium</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label htmlFor="tone">Tone</Label>
-                <Select defaultValue="excited">
-                  <SelectTrigger className="mt-1">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="excited">Excited</SelectItem>
-                    <SelectItem value="informative">Informative</SelectItem>
-                    <SelectItem value="persuasive">Persuasive</SelectItem>
-                    <SelectItem value="inspiring">Inspiring</SelectItem>
-                    <SelectItem value="urgent">Urgent</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            {/* Target Audience */}
+            {/* Review Tone */}
             <div>
-              <Label htmlFor="target-audience">Target Audience</Label>
-              <Input
-                id="target-audience"
-                placeholder="Tech enthusiasts, fitness lovers, commuters..."
-                className="mt-1"
-              />
+              <Label className="text-sm font-medium text-gray-700 mb-2 block">Review Tone (Optional)</Label>
+              <Select value={selectedTone} onValueChange={setSelectedTone}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select review tone" />
+                </SelectTrigger>
+                <SelectContent>
+                  {toneOptions.map((tone) => (
+                    <SelectItem key={tone.value} value={tone.value}>
+                      {tone.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
 
-            {/* Key Messages */}
-            <div>
-              <Label htmlFor="key-messages">Key Messages (Optional)</Label>
-              <Textarea
-                id="key-messages"
-                placeholder="Any specific points you want to highlight..."
-                className="mt-1"
-                rows={2}
-              />
-            </div>
-
-            <Button onClick={handleGenerateContent} className="w-full" size="lg">
-              <Sparkles className="h-5 w-5 mr-2" />
-              Generate UGC Content
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Tips Sidebar - Right Column (1/3) */}
-      <div>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Lightbulb className="h-5 w-5 text-yellow-500" />
-              <span>Pro Tips</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-3">
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <h4 className="font-medium text-blue-900 text-sm">📝 Product Description</h4>
-                <p className="text-xs text-blue-700 mt-1">
-                  Include specific features, benefits, and use cases for better AI understanding.
-                </p>
-              </div>
-
-              <div className="bg-green-50 p-3 rounded-lg">
-                <h4 className="font-medium text-green-900 text-sm">🎯 Target Audience</h4>
-                <p className="text-xs text-green-700 mt-1">
-                  Be specific about demographics, interests, and pain points.
-                </p>
-              </div>
-
-              <div className="bg-purple-50 p-3 rounded-lg">
-                <h4 className="font-medium text-purple-900 text-sm">✨ Content Style</h4>
-                <p className="text-xs text-purple-700 mt-1">
-                  Choose styles that match your brand voice and platform requirements.
-                </p>
-              </div>
-
-              <div className="bg-orange-50 p-3 rounded-lg">
-                <h4 className="font-medium text-orange-900 text-sm">💡 Key Messages</h4>
-                <p className="text-xs text-orange-700 mt-1">Highlight unique selling points and customer benefits.</p>
-              </div>
-
-              <div className="bg-gray-50 p-3 rounded-lg">
-                <h4 className="font-medium text-gray-900 text-sm">📊 Best Practices</h4>
-                <ul className="text-xs text-gray-700 mt-1 space-y-1">
-                  <li>• Use emojis for social posts</li>
-                  <li>• Include CTAs for ads</li>
-                  <li>• Keep stories concise</li>
-                  <li>• Add hashtags strategically</li>
-                </ul>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  )
-
-  const renderGeneratingStep = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2">
-        <Card>
-          <CardContent className="p-8">
-            <div className="text-center space-y-4">
-              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto">
-                <Wand2 className="h-8 w-8 text-primary animate-pulse" />
-              </div>
-              <h3 className="text-xl font-semibold text-gray-900">Generating Your UGC...</h3>
-              <p className="text-gray-600">Our AI is crafting personalized content for your product</p>
-
-              <div className="max-w-md mx-auto space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span>Progress</span>
-                  <span>{Math.round(generationProgress)}%</span>
-                </div>
-                <Progress value={generationProgress} className="h-2" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <div>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Zap className="h-5 w-5 text-primary" />
-              <span>Generating...</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="bg-primary/5 p-3 rounded-lg">
-                <p className="text-sm text-primary font-medium">✨ Analyzing your product</p>
-              </div>
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <p className="text-sm text-blue-700">🎯 Crafting targeted content</p>
-              </div>
-              <div className="bg-green-50 p-3 rounded-lg">
-                <p className="text-sm text-green-700">📝 Optimizing for engagement</p>
-              </div>
-              <div className="bg-yellow-50 p-3 rounded-lg">
-                <p className="text-sm text-yellow-700">🚀 Almost ready!</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  )
-
-  const renderCompleteStep = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-      <div className="lg:col-span-2">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">Generated UGC Content</h2>
-            <p className="text-gray-600">4 pieces of content ready to use</p>
-          </div>
-          <Button
-            onClick={() => {
-              setCurrentStep("form")
-              setGenerationProgress(0)
-            }}
-            variant="outline"
-          >
-            <RotateCcw className="h-4 w-4 mr-2" />
-            Generate More
-          </Button>
-        </div>
-
-        <div className="space-y-4">
-          {generatedContent.map((content) => (
-            <Card key={content.id} className="border">
-              <CardHeader className="pb-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center space-x-3">
-                    <Badge variant="secondary">{content.type}</Badge>
-                    <Badge variant="outline">{content.style}</Badge>
-                    <Badge variant="outline">{content.tone}</Badge>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Button size="sm" variant="ghost">
-                      <Edit className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost">
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                    <Button size="sm" variant="ghost">
-                      <Copy className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="bg-gray-50 p-4 rounded-lg mb-4">
-                  <p className="text-sm whitespace-pre-line">{content.content}</p>
-                </div>
-
-                <div className="flex items-center justify-between text-sm">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-1">
-                      <Heart className="h-4 w-4 text-red-500" />
-                      <span>{content.engagement.likes || content.engagement.views}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <MessageCircle className="h-4 w-4 text-blue-500" />
-                      <span>{content.engagement.comments || content.engagement.replies}</span>
-                    </div>
-                    <div className="flex items-center space-x-1">
-                      <Share2 className="h-4 w-4 text-green-500" />
-                      <span>{content.engagement.shares}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    {content.platforms.map((platform) => (
-                      <Badge key={platform} variant="outline" className="text-xs">
-                        {platform}
-                      </Badge>
-                    ))}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </div>
-
-      {/* Results Summary Sidebar */}
-      <div>
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center space-x-2">
-              <Sparkles className="h-5 w-5 text-primary" />
-              <span>Content Generated!</span>
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-3 text-center">
-              <div className="bg-green-50 p-3 rounded-lg">
-                <div className="text-lg font-bold text-green-600">4</div>
-                <div className="text-xs text-green-700">Content Pieces</div>
-              </div>
-              <div className="bg-blue-50 p-3 rounded-lg">
-                <div className="text-lg font-bold text-blue-600">6</div>
-                <div className="text-xs text-blue-700">Platforms</div>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="font-medium text-gray-900 text-sm">Content Types</h4>
-              <div className="flex flex-wrap gap-1">
-                <Badge variant="secondary" className="text-xs">
-                  Social Posts
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  Stories
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  Video Scripts
-                </Badge>
-                <Badge variant="secondary" className="text-xs">
-                  Ad Copy
-                </Badge>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <h4 className="font-medium text-gray-900 text-sm">Platforms</h4>
-              <div className="flex flex-wrap gap-1">
-                <Badge variant="outline" className="text-xs">
-                  Instagram
-                </Badge>
-                <Badge variant="outline" className="text-xs">
-                  Facebook
-                </Badge>
-                <Badge variant="outline" className="text-xs">
-                  TikTok
-                </Badge>
-                <Badge variant="outline" className="text-xs">
-                  Google Ads
-                </Badge>
-              </div>
-            </div>
-
-            <div className="pt-3 space-y-2">
-              <Button size="sm" className="w-full">
-                <Download className="h-4 w-4 mr-2" />
-                Export All
+            {/* Action Buttons */}
+            <div className="flex space-x-3 pt-4">
+              <Button
+                onClick={handleGenerate}
+                disabled={!selectedProduct || !prompt || isGenerating}
+                className="flex-1 bg-accent hover:bg-accent/90 text-gray-900 font-semibold"
+              >
+                {isGenerating ? (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2 animate-spin" />
+                    Generating...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate UGC
+                  </>
+                )}
               </Button>
-              <Button size="sm" variant="outline" className="w-full bg-transparent">
-                <Share2 className="h-4 w-4 mr-2" />
-                Share Collection
+              <Button variant="outline" onClick={handleSurpriseMe}>
+                <Shuffle className="h-4 w-4 mr-2" />
+                Surprise Me
               </Button>
             </div>
           </CardContent>
         </Card>
-      </div>
-    </div>
-  )
 
-  return (
-    <div className="max-w-7xl mx-auto">
-      {currentStep === "form" && renderFormStep()}
-      {currentStep === "generating" && renderGeneratingStep()}
-      {currentStep === "complete" && renderCompleteStep()}
+        {/* Right Column - Generation Status, Tips, or Results */}
+        {isGenerating ? (
+          <Card className="bg-white border-0 shadow-sm">
+            <CardContent className="p-8 text-center">
+              <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Sparkles className="h-8 w-8 text-primary animate-pulse" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Generating UGC...</h3>
+              <p className="text-gray-600 mb-4">Our AI is creating authentic images and reviews for your product</p>
+              <div className="w-full bg-gray-200 rounded-full h-2">
+                <div className="bg-primary h-2 rounded-full animate-pulse" style={{ width: "60%" }}></div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : showResults ? (
+          <Card className="bg-white border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-primary">Generated UGC</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-3 max-h-[600px] overflow-y-auto">
+                {generatedUGC.map((ugc) => (
+                  <Card key={ugc.id} className="border border-gray-200 overflow-hidden">
+                    {/* User Header */}
+                    <div className="p-2 flex items-center space-x-2 border-b border-gray-100">
+                      <Image
+                        src={ugc.userAvatar || "/placeholder.svg"}
+                        alt={ugc.userName}
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center space-x-1">
+                          <span className="font-medium text-xs truncate">{ugc.userName}</span>
+                          {ugc.verified && (
+                            <div className="w-3 h-3 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0">
+                              <span className="text-white text-xs">✓</span>
+                            </div>
+                          )}
+                        </div>
+                        <div className="flex items-center space-x-1">
+                          {[...Array(ugc.rating)].map((_, i) => (
+                            <Star key={i} className="h-2 w-2 fill-yellow-400 text-yellow-400" />
+                          ))}
+                          <span className="text-xs text-gray-500 ml-1">{ugc.timeAgo}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Generated Image */}
+                    <div className="relative aspect-square">
+                      <Image src={ugc.image || "/placeholder.svg"} alt="Generated UGC" fill className="object-cover" />
+                    </div>
+
+                    {/* Review Content */}
+                    <div className="p-2">
+                      <p className="text-xs text-gray-800 mb-2 leading-relaxed line-clamp-3">{ugc.reviewText}</p>
+
+                      {/* Style & Tone Badges */}
+                      <div className="flex space-x-1 mb-2">
+                        <Badge variant="secondary" className="text-xs px-1 py-0">
+                          {ugc.style}
+                        </Badge>
+                        <Badge variant="outline" className="text-xs px-1 py-0">
+                          {ugc.tone}
+                        </Badge>
+                      </div>
+
+                      {/* Engagement Stats */}
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center space-x-3">
+                          <div className="flex items-center space-x-1">
+                            <Heart className="h-3 w-3 text-red-500" />
+                            <span className="text-xs text-gray-600">{ugc.likes.toLocaleString()}</span>
+                          </div>
+                          <div className="flex items-center space-x-1">
+                            <MessageCircle className="h-3 w-3 text-blue-500" />
+                            <span className="text-xs text-gray-600">{ugc.comments}</span>
+                          </div>
+                        </div>
+
+                        <div className="flex space-x-1">
+                          <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                            <Edit className="h-3 w-3" />
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                            <Eye className="h-3 w-3" />
+                          </Button>
+                          <Button size="sm" variant="ghost" className="h-6 w-6 p-0">
+                            <Download className="h-3 w-3" />
+                          </Button>
+                          <Button size="sm" className="h-6 px-2 bg-primary text-white text-xs">
+                            <Share className="h-3 w-3 mr-1" />
+                            Use
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  </Card>
+                ))}
+              </div>
+
+              <div className="flex justify-center mt-4">
+                <Button
+                  onClick={() => setShowResults(false)}
+                  className="bg-accent hover:bg-accent/90 text-gray-900 font-semibold"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate More
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          <Card className="bg-white border-0 shadow-sm">
+            <CardHeader>
+              <CardTitle className="text-lg font-semibold text-primary">💡 Tips for Better UGC</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-accent rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-sm text-gray-700">
+                    <strong>Be specific:</strong> Include details about setting, lighting, and emotions for realistic
+                    images
+                  </p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-accent rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-sm text-gray-700">
+                    <strong>Use action words:</strong> "stretching", "applying", "wearing", "using" create dynamic
+                    scenes
+                  </p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-accent rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-sm text-gray-700">
+                    <strong>Reviewer names:</strong> Add realistic names to make reviews more authentic and relatable
+                  </p>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="w-2 h-2 bg-accent rounded-full mt-2 flex-shrink-0"></div>
+                  <p className="text-sm text-gray-700">
+                    <strong>Match your audience:</strong> Choose styles and tones that align with your brand voice
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+      </div>
     </div>
   )
 }
