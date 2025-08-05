@@ -11,9 +11,9 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 })
     }
 
-    // For now, redirect to app with success
+    // For now, redirect to our app dashboard with success
     // In production, implement full OAuth callback handling
-    const redirectUrl = `https://${shop}/admin/apps/${process.env.SHOPIFY_API_KEY}`
+    const redirectUrl = `https://getproofix.vercel.app/shopify?shop=${shop}&installed=true`
     return NextResponse.redirect(redirectUrl)
   } catch (error) {
     console.error('Shopify callback error:', error)

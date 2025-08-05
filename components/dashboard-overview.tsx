@@ -27,7 +27,7 @@ export function DashboardOverview() {
   return (
     <div className="space-y-6">
       {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-6">
         <Card className="border-0 shadow-sm">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -106,7 +106,7 @@ export function DashboardOverview() {
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
         {/* Review Trends Chart */}
         <Card className="border-0 shadow-sm">
           <CardHeader className="pb-4">
@@ -181,7 +181,7 @@ export function DashboardOverview() {
       </div>
 
       {/* Recent Activity & Quick Actions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 md:gap-6">
         {/* Recent Reviews */}
         <Card className="border-0 shadow-sm">
           <CardHeader className="flex flex-row items-center justify-between pb-4">
@@ -292,7 +292,7 @@ export function DashboardOverview() {
           <p className="text-sm text-gray-600">Track your progress towards monthly targets</p>
         </CardHeader>
         <CardContent className="pt-0">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6">
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-medium text-gray-700">New Reviews</span>

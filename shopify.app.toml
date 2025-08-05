@@ -1,0 +1,41 @@
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
+client_id = "ac468f53aee133c4db3b53eeb99bfb8f"
+name = "proofix"
+handle = "proofix-2"
+application_url = "https://getproofix.vercel.app/shopify"
+embedded = true
+
+[build]
+include_config_on_deploy = true
+
+[webhooks]
+api_version = "2025-07"
+
+[[webhooks.handlers]]
+api_version = "2025-07"
+event = "orders/fulfilled"
+endpoint = "https://getproofix.vercel.app/api/webhooks/shopify"
+
+[[webhooks.handlers]]
+api_version = "2025-07"
+event = "orders/paid"
+endpoint = "https://getproofix.vercel.app/api/webhooks/shopify"
+
+[[webhooks.handlers]]
+api_version = "2025-07"
+event = "products/update"
+endpoint = "https://getproofix.vercel.app/api/webhooks/shopify"
+
+[access_scopes]
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
+scopes = "read_products,write_products,read_orders,write_orders,read_customers,write_customers"
+
+[auth]
+redirect_urls = [ 
+  "https://getproofix.vercel.app/api/auth/shopify/callback",
+  "https://getproofix.vercel.app/install"
+]
+
+[pos]
+embedded = false

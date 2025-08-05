@@ -22,12 +22,14 @@ function ShopifyAppContent() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   useEffect(() => {
-    // Check if we have a valid session
+    // Check if we have a valid session or just installed
     const checkAuth = async () => {
       try {
         // In a real app, you'd verify the session with your backend
         const session = searchParams.get('session')
-        if (session || shop) {
+        const installed = searchParams.get('installed')
+        
+        if (session || shop || installed === 'true') {
           setIsAuthenticated(true)
         }
       } catch (error) {

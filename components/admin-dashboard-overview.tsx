@@ -95,7 +95,7 @@ export function AdminDashboardOverview() {
   return (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 md:gap-6">
         {summaryCards.map((card) => (
           <Card key={card.title} className="border-0 shadow-sm">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -114,9 +114,9 @@ export function AdminDashboardOverview() {
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 xl:grid-cols-3 gap-4 md:gap-6">
         {/* Chart Placeholder */}
-        <Card className="lg:col-span-2 border-0 shadow-sm">
+        <Card className="xl:col-span-2 border-0 shadow-sm">
           <CardHeader>
             <CardTitle className="text-lg font-semibold text-gray-900">Weekly Activity</CardTitle>
           </CardHeader>

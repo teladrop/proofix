@@ -22,9 +22,11 @@ export default function InstallPageContent() {
     setIsInstalling(true)
     
     try {
-      // Redirect to Shopify OAuth
-      const authUrl = `/api/auth/shopify?shop=${shop}`
-      window.location.href = authUrl
+      // Simulate installation process
+      setTimeout(() => {
+        // Redirect to the dashboard after successful installation
+        window.location.href = `/shopify?shop=${shop}&installed=true`
+      }, 2000)
     } catch (error) {
       console.error('Installation error:', error)
       setIsInstalling(false)
